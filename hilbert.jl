@@ -46,11 +46,26 @@ b = B(n)
 x0 = zeros(BigFloat, n)
 tol = 1e-5
 max_iter = 100000
-
+ω = 0.5
 #x_cg = Resolve_Cholesky(A, b)
-x_gd = Resolve_LU(A, b)
+
+x_sor = SOR(A, b, ω, tol, max_iter)
+x_jor = JOR(A, b, ω, tol, max_iter)
+x_md = maxima_descida(A, b, x0, tol, max_iter)
+x_gc = grad_conj(A, b, x0, tol, max_iter)
+x_ch = Resolve_CHolensky(A, b)
+x_lu = Resolve_LU(A, b)
 
 
 x_sol = A \ b
 #println("Erro Cholensky:", norm(x_cg - x_sol))
-println("Erro LU:", norm(x_gd - x_sol))
+function er(x_pred, x_ot)
+    return norm(x_ot - x_pred)
+end
+
+println("Erro SOR:", er(x_sor, x_sol))
+println("Erro JOR:", er(x_jor, x_sol))
+println("Erro Max Des:", er(x_md, x_sol))
+println("Erro Grad:", er(x_gc, x_sol))
+println("Erro Cholensky:", er(x_ch, x_sol))
+println("Erro LU:", er(x_lu, x_sol))
